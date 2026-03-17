@@ -1,0 +1,4 @@
+.env
+db/notices.db
+__pycache__/
+*.pyc
