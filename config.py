@@ -9,6 +9,9 @@ BIZINFO_API_URL = "https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do"
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
 KEYWORDS = [
     # 사업자 유형
     "소상공인", "소공인", "개인사업자", "1인창업",
@@ -21,5 +24,3 @@ KEYWORDS = [
     # 경영/마케팅
     "브랜딩", "마케팅", "판로", "컨설팅",
 ]
-
-DB_PATH = os.path.join(os.path.dirname(__file__), "db", "notices.db")

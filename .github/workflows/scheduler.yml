@@ -21,16 +21,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Restore DB
-        uses: actions/cache@v4
-        with:
-          path: db/notices.db
-          key: notices-db-${{ github.run_id }}
-          restore-keys: notices-db-
-
       - name: Run BizRadar
         env:
           BIZINFO_API_KEY: ${{ secrets.BIZINFO_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: python main.py
