@@ -14,7 +14,7 @@ HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>공고 레이더 — BizRadar</title>
+<title>공고 레이더 — 땅콩이</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
 
@@ -296,7 +296,7 @@ HTML = """<!DOCTYPE html>
   <div class="header-inner">
     <a class="logo" href="/">
       <div class="logo-icon">📡</div>
-      BizRadar
+      땅콩이
     </a>
     <span class="badge">공고 레이더</span>
   </div>
