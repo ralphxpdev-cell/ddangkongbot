@@ -52,7 +52,7 @@ HTML = """<!DOCTYPE html>
   </div>
   <span class="text-sm font-bold tracking-tight">땅콩봇</span>
   <div class="w-px h-4 bg-white/10"></div>
-  <span class="text-xs text-zinc-500 font-medium">공고 레이더</span>
+  <span class="text-xs text-zinc-400 font-medium">공고 레이더</span>
 </nav>
 
 <!-- HERO -->
@@ -85,19 +85,19 @@ HTML = """<!DOCTYPE html>
           id="searchInput"
           placeholder="공고명, 기관명 검색..."
           oninput="applyFilter()"
-          class="bg-transparent outline-none text-sm text-zinc-100 placeholder-zinc-600 w-full"
+          class="bg-transparent outline-none text-sm text-zinc-100 placeholder-zinc-500 w-full"
         >
       </div>
 
       <!-- 칩 -->
       <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200 chip-active" data-kw="">전체</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="창업">창업</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="청년">청년</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="농업">농업</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="소상공인">소상공인</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="바우처">바우처</button>
-        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="마케팅">마케팅</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200 chip-active" data-kw="">전체</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="창업">창업</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="청년">청년</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="농업">농업</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="소상공인">소상공인</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="바우처">바우처</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-500 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="마케팅">마케팅</button>
       </div>
 
     </div>
@@ -110,7 +110,7 @@ HTML = """<!DOCTYPE html>
     <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
       {% for n in notices %}
-      <div class="card reveal card-bezel rounded-2xl p-5 flex flex-col gap-4 transition-all duration-300 cursor-default"
+      <div class="card reveal card-bezel rounded-2xl p-6 flex flex-col gap-4 transition-all duration-300 cursor-default"
            style="--index: {{ loop.index0 }};"
            data-title="{{ n.pblanc_nm }}"
            data-org="{{ n.jrsd_instt_nm }}"
@@ -118,7 +118,7 @@ HTML = """<!DOCTYPE html>
 
         <!-- 상단 -->
         <div class="flex items-start justify-between gap-2">
-          <span class="text-[11px] font-medium text-zinc-500 bg-white/5 border border-white/8 px-2.5 py-1 rounded-lg truncate max-w-[160px]">
+          <span class="text-[11px] font-medium text-zinc-400 bg-white/5 border border-white/8 px-2.5 py-1 rounded-lg truncate max-w-[160px]">
             {{ n.jrsd_instt_nm or '기관 미상' }}
           </span>
           <span class="flex-shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg
@@ -131,11 +131,11 @@ HTML = """<!DOCTYPE html>
         </div>
 
         <!-- 제목 -->
-        <p class="text-sm font-semibold text-zinc-100 leading-snug flex-1">{{ n.pblanc_nm }}</p>
+        <p class="text-base font-semibold text-zinc-100 leading-snug flex-1">{{ n.pblanc_nm }}</p>
 
         <!-- 날짜 -->
         {% if n.period %}
-        <div class="flex items-center gap-1.5 text-xs text-zinc-600">
+        <div class="flex items-center gap-1.5 text-xs text-zinc-500">
           <iconify-icon icon="solar:calendar-linear" style="font-size:13px;"></iconify-icon>
           <span>{{ n.period }}</span>
         </div>
@@ -145,7 +145,7 @@ HTML = """<!DOCTYPE html>
         {% if n.tags_list %}
         <div class="flex flex-wrap gap-1.5">
           {% for tag in n.tags_list %}
-          <span class="text-[11px] font-medium px-2 py-0.5 rounded-md" style="background: rgba(245,166,35,0.08); color: rgba(245,166,35,0.7); border: 1px solid rgba(245,166,35,0.15);"># {{ tag }}</span>
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-md" style="background: rgba(245,166,35,0.1); color: rgba(245,166,35,0.9); border: 1px solid rgba(245,166,35,0.25);"># {{ tag }}</span>
           {% endfor %}
         </div>
         {% endif %}
@@ -160,7 +160,7 @@ HTML = """<!DOCTYPE html>
             <iconify-icon icon="solar:arrow-right-up-linear" style="font-size:13px;"></iconify-icon>
           </a>
           {% else %}
-          <div class="flex items-center justify-center w-full py-2.5 rounded-xl text-xs font-medium text-zinc-700 border border-white/5">
+          <div class="flex items-center justify-center w-full py-2.5 rounded-xl text-xs font-medium text-zinc-600 border border-white/8">
             링크 없음
           </div>
           {% endif %}
@@ -172,7 +172,7 @@ HTML = """<!DOCTYPE html>
       <!-- 빈 상태 -->
       <div class="col-span-full flex flex-col items-center justify-center py-32 gap-4 text-center">
         <div class="w-16 h-16 rounded-2xl flex items-center justify-center card-bezel">
-          <iconify-icon icon="solar:inbox-out-linear" class="text-zinc-600" style="font-size:32px;"></iconify-icon>
+          <iconify-icon icon="solar:inbox-out-linear" class="text-zinc-500" style="font-size:32px;"></iconify-icon>
         </div>
         <div>
           <p class="text-sm font-semibold text-zinc-400">아직 수집된 공고가 없어요</p>
@@ -190,9 +190,9 @@ HTML = """<!DOCTYPE html>
   <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
     <div class="flex items-center gap-2">
       <iconify-icon icon="solar:radar-2-bold-duotone" style="color:#F5A623; font-size:16px;"></iconify-icon>
-      <span class="text-xs font-bold text-zinc-500">땅콩봇</span>
+      <span class="text-xs font-bold text-zinc-400">땅콩봇</span>
     </div>
-    <p class="text-xs text-zinc-700">bizinfo.go.kr 기준 · 매일 09:00 KST 자동 수집</p>
+    <p class="text-xs text-zinc-600">bizinfo.go.kr 기준 · 매일 09:00 KST 자동 수집</p>
   </div>
 </footer>
 
