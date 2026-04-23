@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from flask import Flask, render_template_string, request
+from flask import Flask, render_template_string
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -29,196 +29,146 @@ HTML = """<!DOCTYPE html>
 </script>
 <style>
   * { word-break: keep-all; }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
-  }
+  .reveal { opacity: 0; transform: translateY(12px); transition: opacity 0.45s cubic-bezier(0.16,1,0.3,1), transform 0.45s cubic-bezier(0.16,1,0.3,1); }
   .reveal.visible { opacity: 1; transform: translateY(0); }
-
-  .card {
-    background: #18181b;
-    border: 1px solid #27272a;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .card:hover {
-    border-color: #3f3f46;
-    background: #1c1c1f;
-  }
-
-  .tag-chip {
-    background: #27272a;
-    color: #d4d4d8;
-    border: 1px solid #3f3f46;
-  }
-
-  .btn-link {
-    background: #fbbf24;
-    color: #0a0a0a;
-    font-weight: 700;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .btn-link:hover { background: #f59e0b; transform: translateY(-1px); }
-  .btn-link:active { transform: scale(0.98); }
-
-  .search-wrap {
-    background: #18181b;
-    border: 1px solid #27272a;
-    transition: border-color 0.2s;
-  }
-  .search-wrap:focus-within { border-color: #fbbf24; }
-
-  .chip {
-    background: #18181b;
-    border: 1px solid #27272a;
-    color: #a1a1aa;
-    transition: all 0.15s;
-  }
-  .chip:hover { border-color: #52525b; color: #e4e4e7; }
-  .chip.active {
-    background: #fbbf24;
-    border-color: #fbbf24;
-    color: #0a0a0a;
-    font-weight: 700;
-  }
-
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-[100dvh] font-sans antialiased">
+<body class="bg-gray-50 text-gray-900 min-h-[100dvh] font-sans antialiased">
 
 <!-- NAV -->
-<nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-2.5 rounded-full border border-zinc-800 backdrop-blur-xl" style="background: rgba(9,9,11,0.9);">
-  <div class="w-6 h-6 rounded-md flex items-center justify-center bg-amber-400">
-    <iconify-icon icon="solar:radar-2-bold" style="color:#0a0a0a; font-size:14px;"></iconify-icon>
+<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg bg-amber-400 flex items-center justify-center">
+        <iconify-icon icon="solar:radar-2-bold" style="color:#fff; font-size:15px;"></iconify-icon>
+      </div>
+      <span class="font-bold text-gray-900 text-sm">땅콩봇</span>
+    </div>
+    <span class="text-xs text-gray-400">매일 09:00 자동 수집</span>
   </div>
-  <span class="text-sm font-bold text-zinc-100">땅콩봇</span>
-  <span class="text-zinc-700">·</span>
-  <span class="text-xs text-zinc-500">공고 레이더</span>
-</nav>
+</header>
 
 <!-- HERO -->
-<section class="pt-32 pb-8 px-4 sm:px-6">
-  <div class="max-w-5xl mx-auto reveal" style="--index:0;">
-    <div class="flex items-center gap-2 mb-5">
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block"></span>
-      <span class="text-xs text-zinc-500 font-medium tracking-wider uppercase">실시간 연동 중</span>
-    </div>
-    <h1 class="text-5xl md:text-6xl font-bold tracking-tight leading-tight text-zinc-100 mb-4">
-      신청 가능한 공고<br><span class="text-amber-400">{{ total }}건</span>
-    </h1>
-    <p class="text-zinc-500 text-lg">창업 · 청년 · 농업 · 소상공인 · 바우처 키워드 자동 수집</p>
-  </div>
+<section class="max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-6 reveal" style="--index:0;">
+  <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-2">
+    지금 신청 가능한 공고 <span class="text-amber-500">{{ total }}건</span>
+  </h1>
+  <p class="text-sm text-gray-500">창업 · 청년 · 농업 · 소상공인 · 바우처 키워드 필터 적용</p>
 </section>
 
 <!-- FILTER -->
-<div class="sticky top-[4.5rem] z-40 px-4 sm:px-6 pb-6 pt-2" style="background: linear-gradient(to bottom, #09090b 80%, transparent);">
-  <div class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
+<div class="sticky top-14 z-40 bg-gray-50 border-b border-gray-200">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-col sm:flex-row gap-2">
 
-    <div class="search-wrap flex items-center gap-3 px-4 py-3 rounded-2xl flex-1">
-      <iconify-icon icon="solar:magnifer-linear" style="color:#71717a; font-size:18px; flex-shrink:0;"></iconify-icon>
-      <input type="text" id="searchInput" placeholder="공고명, 기관명으로 검색..." oninput="applyFilter()"
-        class="bg-transparent outline-none text-sm text-zinc-100 placeholder-zinc-600 w-full">
+    <!-- 검색 -->
+    <div class="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex-1 focus-within:border-amber-400 transition-colors duration-150">
+      <iconify-icon icon="solar:magnifer-linear" style="color:#9ca3af; font-size:16px; flex-shrink:0;"></iconify-icon>
+      <input type="text" id="searchInput" placeholder="공고명, 기관명 검색..." oninput="applyFilter()"
+        class="bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400 w-full">
     </div>
 
-    <div class="flex gap-2 overflow-x-auto scrollbar-hide">
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl active" data-kw="">전체</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="창업">창업</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="청년">청년</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="농업">농업</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="소상공인">소상공인</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="바우처">바우처</button>
-      <button class="chip flex-shrink-0 text-xs px-4 py-2.5 rounded-xl" data-kw="마케팅">마케팅</button>
+    <!-- 칩 -->
+    <div class="flex gap-1.5 overflow-x-auto pb-0.5" style="-ms-overflow-style:none; scrollbar-width:none;">
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="">전체</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="창업">창업</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="청년">청년</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="농업">농업</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="소상공인">소상공인</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="바우처">바우처</button>
+      <button class="chip flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:border-gray-300 transition-all duration-150 whitespace-nowrap" data-kw="마케팅">마케팅</button>
     </div>
 
   </div>
 </div>
 
-<!-- GRID -->
-<section class="px-4 sm:px-6 pb-24">
-  <div class="max-w-5xl mx-auto">
-    <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+<!-- LIST -->
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-24">
+  <div id="grid" class="flex flex-col gap-3">
 
-      {% for n in notices %}
-      <div class="card reveal rounded-2xl flex flex-col"
-           style="--index: {{ loop.index0 }};"
-           data-title="{{ n.pblanc_nm }}"
-           data-org="{{ n.jrsd_instt_nm }}"
-           data-tags="{{ n.hashtags }}">
+    {% for n in notices %}
+    <div class="card reveal bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-150 overflow-hidden flex"
+         style="--index: {{ loop.index0 }};"
+         data-title="{{ n.pblanc_nm }}"
+         data-org="{{ n.jrsd_instt_nm }}"
+         data-tags="{{ n.hashtags }}">
 
-        <!-- 카드 상단: 기관 + D-day -->
-        <div class="px-5 pt-5 pb-4 flex items-center justify-between gap-2 border-b border-zinc-800">
-          <span class="text-xs text-zinc-500 truncate max-w-[180px]">{{ n.jrsd_instt_nm or '기관 미상' }}</span>
-          <span class="flex-shrink-0 text-xs font-bold px-2.5 py-1 rounded-lg
-            {% if n.dday_class == 'urgent' %}bg-red-950 text-red-400
-            {% elif n.dday_class == 'soon' %}bg-orange-950 text-orange-400
-            {% elif n.dday_class == 'normal' %}bg-emerald-950 text-emerald-400
-            {% else %}bg-zinc-800 text-zinc-500{% endif %}">
-            {{ n.dday_label }}
-          </span>
-        </div>
+      <!-- 긴급도 색상 바 (좌측) -->
+      <div class="w-1 flex-shrink-0
+        {% if n.dday_class == 'urgent' %}bg-red-400
+        {% elif n.dday_class == 'soon' %}bg-orange-400
+        {% elif n.dday_class == 'normal' %}bg-emerald-400
+        {% else %}bg-gray-200{% endif %}">
+      </div>
 
-        <!-- 카드 본문: 제목 + 날짜 -->
-        <div class="px-5 py-4 flex-1 flex flex-col gap-3">
-          <p class="text-base font-semibold text-zinc-100 leading-snug">{{ n.pblanc_nm }}</p>
+      <!-- 본문 -->
+      <div class="flex-1 px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3">
 
-          {% if n.period %}
-          <div class="flex items-center gap-1.5">
-            <iconify-icon icon="solar:calendar-minimalistic-linear" style="color:#52525b; font-size:13px;"></iconify-icon>
-            <span class="text-xs text-zinc-500">{{ n.period }}</span>
+        <!-- 좌: 텍스트 정보 -->
+        <div class="flex-1 min-w-0 flex flex-col gap-2">
+
+          <!-- 기관 + D-day -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs text-gray-400 font-medium">{{ n.jrsd_instt_nm or '기관 미상' }}</span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-md
+              {% if n.dday_class == 'urgent' %}bg-red-50 text-red-500
+              {% elif n.dday_class == 'soon' %}bg-orange-50 text-orange-500
+              {% elif n.dday_class == 'normal' %}bg-emerald-50 text-emerald-600
+              {% else %}bg-gray-100 text-gray-400{% endif %}">
+              {{ n.dday_label }}
+            </span>
           </div>
-          {% endif %}
 
-          {% if n.tags_list %}
-          <div class="flex flex-wrap gap-1.5 mt-1">
+          <!-- 제목 -->
+          <p class="text-base font-semibold text-gray-900 leading-snug">{{ n.pblanc_nm }}</p>
+
+          <!-- 날짜 + 태그 -->
+          <div class="flex flex-wrap items-center gap-2">
+            {% if n.period %}
+            <span class="text-xs text-gray-400 flex items-center gap-1">
+              <iconify-icon icon="solar:calendar-minimalistic-linear" style="font-size:12px;"></iconify-icon>
+              {{ n.period }}
+            </span>
+            {% endif %}
             {% for tag in n.tags_list %}
-            <span class="tag-chip text-xs px-2.5 py-1 rounded-lg font-medium">{{ tag }}</span>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">{{ tag }}</span>
             {% endfor %}
           </div>
-          {% endif %}
+
         </div>
 
-        <!-- 카드 하단: 버튼 -->
-        <div class="px-5 pb-5">
-          {% if n.pblanc_url %}
-          <a href="{{ n.pblanc_url }}" target="_blank" rel="noopener"
-             class="btn-link flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm">
-            공고 바로가기
-            <iconify-icon icon="solar:arrow-right-up-linear" style="font-size:14px;"></iconify-icon>
-          </a>
-          {% else %}
-          <div class="flex items-center justify-center w-full py-3 rounded-xl text-xs text-zinc-600 bg-zinc-900">
-            링크 없음
-          </div>
-          {% endif %}
-        </div>
+        <!-- 우: 버튼 -->
+        {% if n.pblanc_url %}
+        <a href="{{ n.pblanc_url }}" target="_blank" rel="noopener"
+           class="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 active:scale-95 text-white font-bold text-sm transition-all duration-150 whitespace-nowrap">
+          바로가기
+          <iconify-icon icon="solar:arrow-right-up-linear" style="font-size:14px;"></iconify-icon>
+        </a>
+        {% endif %}
 
       </div>
-      {% else %}
-
-      <div class="col-span-full py-40 flex flex-col items-center gap-4 text-center">
-        <iconify-icon icon="solar:inbox-out-linear" style="font-size:48px; color:#3f3f46;"></iconify-icon>
-        <p class="text-zinc-500 font-medium">아직 수집된 공고가 없어요</p>
-        <p class="text-sm text-zinc-700">매일 오전 9시에 자동으로 수집됩니다</p>
-      </div>
-
-      {% endfor %}
     </div>
+    {% else %}
+
+    <div class="py-32 flex flex-col items-center gap-3 text-center">
+      <iconify-icon icon="solar:inbox-out-linear" style="font-size:44px; color:#d1d5db;"></iconify-icon>
+      <p class="text-gray-500 font-medium">아직 수집된 공고가 없어요</p>
+      <p class="text-sm text-gray-400">매일 오전 9시에 자동으로 수집됩니다</p>
+    </div>
+
+    {% endfor %}
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="border-t border-zinc-900 px-4 sm:px-6 py-8">
-  <div class="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-3">
+<footer class="border-t border-gray-200 bg-white px-4 sm:px-6 py-6">
+  <div class="max-w-4xl mx-auto flex items-center justify-between flex-wrap gap-3">
     <div class="flex items-center gap-2">
       <div class="w-5 h-5 rounded bg-amber-400 flex items-center justify-center">
-        <iconify-icon icon="solar:radar-2-bold" style="color:#0a0a0a; font-size:11px;"></iconify-icon>
+        <iconify-icon icon="solar:radar-2-bold" style="color:#fff; font-size:11px;"></iconify-icon>
       </div>
-      <span class="text-sm font-bold text-zinc-400">땅콩봇</span>
+      <span class="text-sm font-bold text-gray-700">땅콩봇</span>
     </div>
-    <p class="text-xs text-zinc-700">bizinfo.go.kr 기준 · 매일 09:00 KST 자동 수집</p>
+    <p class="text-xs text-gray-400">bizinfo.go.kr 기준 · 매일 09:00 KST 자동 수집</p>
   </div>
 </footer>
 
@@ -227,12 +177,20 @@ HTML = """<!DOCTYPE html>
 
   document.querySelectorAll('.chip').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll('.chip').forEach(b => {
+        b.classList.remove('bg-amber-400', 'text-white', 'border-amber-400');
+        b.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+      });
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+      btn.classList.add('bg-amber-400', 'text-white', 'border-amber-400');
       activeKw = btn.dataset.kw;
       applyFilter();
     });
   });
+
+  // 첫 번째 칩(전체) 기본 활성
+  document.querySelector('.chip').classList.remove('bg-white', 'text-gray-600', 'border-gray-200');
+  document.querySelector('.chip').classList.add('bg-amber-400', 'text-white', 'border-amber-400');
 
   function applyFilter() {
     const q = document.getElementById('searchInput').value.toLowerCase();
@@ -246,11 +204,11 @@ HTML = """<!DOCTYPE html>
     entries.forEach(e => {
       if (e.isIntersecting) {
         const idx = parseInt(e.target.style.getPropertyValue('--index')) || 0;
-        setTimeout(() => e.target.classList.add('visible'), Math.min(idx, 8) * 50);
+        setTimeout(() => e.target.classList.add('visible'), Math.min(idx, 10) * 40);
         io.unobserve(e.target);
       }
     });
-  }, { threshold: 0.05 });
+  }, { threshold: 0.04 });
 
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
