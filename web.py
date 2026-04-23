@@ -86,7 +86,8 @@ HTML = """<!DOCTYPE html>
   <div id="grid" class="flex flex-col gap-3">
 
     {% for n in notices %}
-    <div class="card reveal bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all duration-150 overflow-hidden flex"
+    <div class="card reveal bg-white rounded-2xl overflow-hidden flex transition-all duration-150 hover:bg-gray-50"
+         style="border: 1.5px solid #e9e9e9; box-shadow: 0 4px 20px rgba(0,0,0,0.08);"
          style="--index: {{ loop.index0 }};"
          data-title="{{ n.pblanc_nm }}"
          data-org="{{ n.jrsd_instt_nm }}"
