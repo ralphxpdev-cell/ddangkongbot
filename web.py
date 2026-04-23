@@ -14,363 +14,195 @@ HTML = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>공고 레이더 — 땅콩봇</title>
+<title>땅콩봇 — 국가사업 공고 레이더</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css">
+<script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] },
+        colors: {
+          accent: '#F5A623',
+        }
+      }
+    }
+  }
+</script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg:        #F5F6FA;
-    --surface:   #FFFFFF;
-    --border:    #E4E7EE;
-    --primary:   #2E6DF5;
-    --primary-light: #EEF3FF;
-    --text:      #1A1D27;
-    --sub:       #6B7280;
-    --tag-bg:    #F0F3FF;
-    --tag-text:  #4361C2;
-    --dday-red:  #EF4444;
-    --dday-orange: #F97316;
-    --dday-green:  #22C55E;
-    --radius:    12px;
-  }
-
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── 헤더 ── */
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .logo-icon {
-    width: 34px; height: 34px;
-    background: var(--primary);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .badge {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-  }
-
-  /* ── 메인 ── */
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px 24px 60px;
-  }
-
-  /* ── 히어로 텍스트 ── */
-  .hero {
-    margin-bottom: 28px;
-  }
-  .hero h1 {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-  .hero p {
-    font-size: 14px;
-    color: var(--sub);
-  }
-  .total-count {
-    color: var(--primary);
-    font-weight: 700;
-  }
-
-  /* ── 검색/필터 ── */
-  .filter-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
-  .search-wrap {
-    position: relative;
-    flex: 1;
-    min-width: 220px;
-  }
-  .search-wrap input {
-    width: 100%;
-    height: 44px;
-    padding: 0 16px 0 42px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 14px;
-    font-family: inherit;
-    background: var(--surface);
-    outline: none;
-    transition: border-color .15s;
-  }
-  .search-wrap input:focus { border-color: var(--primary); }
-  .search-icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--sub);
-    font-size: 16px;
-  }
-  .filter-chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .chip {
-    height: 44px;
-    padding: 0 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-family: inherit;
-    background: var(--surface);
-    color: var(--sub);
-    cursor: pointer;
-    transition: all .15s;
-    white-space: nowrap;
-  }
-  .chip:hover, .chip.active {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: var(--primary-light);
-    font-weight: 600;
-  }
-
-  /* ── 그리드 ── */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
-  }
-
-  /* ── 카드 ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: box-shadow .15s, transform .15s;
-    cursor: default;
-  }
-  .card:hover {
-    box-shadow: 0 6px 24px rgba(46,109,245,.10);
-    transform: translateY(-2px);
-  }
-
-  .card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 10px;
-  }
-
-  .org-badge {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--sub);
-    background: var(--bg);
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 160px;
-  }
-
-  .dday {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .dday.urgent  { background: #FEF2F2; color: var(--dday-red); }
-  .dday.soon    { background: #FFF7ED; color: var(--dday-orange); }
-  .dday.normal  { background: #F0FDF4; color: var(--dday-green); }
-  .dday.unknown { background: var(--bg); color: var(--sub); }
-
-  .card-title {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.5;
-    color: var(--text);
-  }
-
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--sub);
-  }
-  .card-meta span { display: flex; align-items: center; gap: 4px; }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .tag {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--tag-text);
-    background: var(--tag-bg);
-    padding: 3px 9px;
-    border-radius: 20px;
-  }
-
-  .card-footer {
-    margin-top: auto;
-    padding-top: 4px;
-  }
-  .btn-link {
-    display: block;
-    text-align: center;
-    padding: 10px;
-    background: var(--primary-light);
-    color: var(--primary);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: background .15s;
-  }
-  .btn-link:hover { background: var(--primary); color: #fff; }
-
-  /* ── 빈 상태 ── */
-  .empty {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--sub);
-  }
-  .empty p { font-size: 15px; margin-top: 12px; }
-
-  /* ── 반응형 ── */
-  @media (max-width: 600px) {
-    main { padding: 20px 16px 40px; }
-    .hero h1 { font-size: 20px; }
-    .grid { grid-template-columns: 1fr; }
-  }
+  * { word-break: keep-all; }
+  .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .card-bezel { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); }
+  .card-bezel:hover { background: rgba(255,255,255,0.06); border-color: rgba(245,166,35,0.3); }
+  .chip-active { background: rgba(245,166,35,0.15); border-color: rgba(245,166,35,0.5); color: #F5A623; }
+  .search-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+  .search-box:focus-within { border-color: rgba(245,166,35,0.5); background: rgba(255,255,255,0.07); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 </head>
-<body>
+<body class="bg-zinc-950 text-zinc-100 min-h-[100dvh] font-sans antialiased">
 
-<header>
-  <div class="header-inner">
-    <a class="logo" href="/">
-      <div class="logo-icon">📡</div>
-      땅콩봇
-    </a>
-    <span class="badge">공고 레이더</span>
+<!-- NAV -->
+<nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-2.5 rounded-full border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-xl" style="background: rgba(24,24,27,0.85);">
+  <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: rgba(245,166,35,0.15); border: 1px solid rgba(245,166,35,0.3);">
+    <iconify-icon icon="solar:radar-2-bold-duotone" style="color:#F5A623; font-size:16px;"></iconify-icon>
   </div>
-</header>
+  <span class="text-sm font-bold tracking-tight">땅콩봇</span>
+  <div class="w-px h-4 bg-white/10"></div>
+  <span class="text-xs text-zinc-500 font-medium">공고 레이더</span>
+</nav>
 
-<main>
-  <div class="hero">
-    <h1>지금 신청 가능한 공고 <span class="total-count">{{ total }}건</span></h1>
-    <p>bizinfo.go.kr 기준 · 키워드 필터 적용 공고만 표시</p>
-  </div>
-
-  <div class="filter-bar">
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="공고명, 기관명 검색..." oninput="applyFilter()">
-    </div>
-    <div class="filter-chips" id="chips">
-      <button class="chip active" data-kw="">전체</button>
-      <button class="chip" data-kw="창업">창업</button>
-      <button class="chip" data-kw="청년">청년</button>
-      <button class="chip" data-kw="농업">농업</button>
-      <button class="chip" data-kw="소상공인">소상공인</button>
-      <button class="chip" data-kw="바우처">바우처</button>
-      <button class="chip" data-kw="마케팅">마케팅</button>
+<!-- HERO -->
+<section class="pt-32 pb-10 px-4">
+  <div class="max-w-7xl mx-auto">
+    <div class="reveal" style="--index:0;">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></div>
+        <span class="text-xs text-zinc-500 font-medium tracking-widest uppercase">bizinfo.go.kr 연동</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-zinc-100 mb-3">
+        지금 신청 가능한 공고<br>
+        <span style="color:#F5A623;">{{ total }}건</span>
+      </h1>
+      <p class="text-base text-zinc-500 leading-relaxed">창업·청년·농업·소상공인·바우처 키워드 필터 적용</p>
     </div>
   </div>
+</section>
 
-  <div class="grid" id="grid">
-    {% for n in notices %}
-    <div class="card"
-         data-title="{{ n.pblanc_nm }}"
-         data-org="{{ n.jrsd_instt_nm }}"
-         data-tags="{{ n.hashtags }}">
-      <div class="card-top">
-        <span class="org-badge">{{ n.jrsd_instt_nm or '기관 미상' }}</span>
-        <span class="dday {{ n.dday_class }}">{{ n.dday_label }}</span>
+<!-- FILTER -->
+<section class="px-4 pb-8 sticky top-[4.5rem] z-40" style="background: linear-gradient(to bottom, rgba(9,9,11,0.95) 85%, transparent);">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col sm:flex-row gap-3">
+
+      <!-- 검색 -->
+      <div class="search-box flex items-center gap-2 px-4 py-3 rounded-xl flex-1 transition-all duration-300">
+        <iconify-icon icon="solar:magnifer-linear" class="text-zinc-500 flex-shrink-0" style="font-size:18px;"></iconify-icon>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="공고명, 기관명 검색..."
+          oninput="applyFilter()"
+          class="bg-transparent outline-none text-sm text-zinc-100 placeholder-zinc-600 w-full"
+        >
       </div>
-      <div class="card-title">{{ n.pblanc_nm }}</div>
-      {% if n.reqst_begin_end_de %}
-      <div class="card-meta">
-        <span>📅 {{ n.period }}</span>
+
+      <!-- 칩 -->
+      <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200 chip-active" data-kw="">전체</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="창업">창업</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="청년">청년</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="농업">농업</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="소상공인">소상공인</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="바우처">바우처</button>
+        <button class="chip flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold border border-white/10 text-zinc-400 transition-all duration-200 hover:border-accent/40 hover:text-zinc-200" data-kw="마케팅">마케팅</button>
       </div>
-      {% endif %}
-      {% if n.tags_list %}
-      <div class="tags">
-        {% for tag in n.tags_list %}
-        <span class="tag"># {{ tag }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
-      <div class="card-footer">
-        {% if n.pblanc_url %}
-        <a class="btn-link" href="{{ n.pblanc_url }}" target="_blank" rel="noopener">공고 바로가기 →</a>
-        {% else %}
-        <span class="btn-link" style="cursor:default;opacity:.5;">링크 없음</span>
+
+    </div>
+  </div>
+</section>
+
+<!-- GRID -->
+<section class="px-4 pb-20">
+  <div class="max-w-7xl mx-auto">
+    <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      {% for n in notices %}
+      <div class="card reveal card-bezel rounded-2xl p-5 flex flex-col gap-4 transition-all duration-300 cursor-default"
+           style="--index: {{ loop.index0 }};"
+           data-title="{{ n.pblanc_nm }}"
+           data-org="{{ n.jrsd_instt_nm }}"
+           data-tags="{{ n.hashtags }}">
+
+        <!-- 상단 -->
+        <div class="flex items-start justify-between gap-2">
+          <span class="text-[11px] font-medium text-zinc-500 bg-white/5 border border-white/8 px-2.5 py-1 rounded-lg truncate max-w-[160px]">
+            {{ n.jrsd_instt_nm or '기관 미상' }}
+          </span>
+          <span class="flex-shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-lg
+            {% if n.dday_class == 'urgent' %}bg-red-500/10 text-red-400 border border-red-500/20
+            {% elif n.dday_class == 'soon' %}bg-orange-500/10 text-orange-400 border border-orange-500/20
+            {% elif n.dday_class == 'normal' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+            {% else %}bg-white/5 text-zinc-500 border border-white/8{% endif %}">
+            {{ n.dday_label }}
+          </span>
+        </div>
+
+        <!-- 제목 -->
+        <p class="text-sm font-semibold text-zinc-100 leading-snug flex-1">{{ n.pblanc_nm }}</p>
+
+        <!-- 날짜 -->
+        {% if n.period %}
+        <div class="flex items-center gap-1.5 text-xs text-zinc-600">
+          <iconify-icon icon="solar:calendar-linear" style="font-size:13px;"></iconify-icon>
+          <span>{{ n.period }}</span>
+        </div>
         {% endif %}
+
+        <!-- 태그 -->
+        {% if n.tags_list %}
+        <div class="flex flex-wrap gap-1.5">
+          {% for tag in n.tags_list %}
+          <span class="text-[11px] font-medium px-2 py-0.5 rounded-md" style="background: rgba(245,166,35,0.08); color: rgba(245,166,35,0.7); border: 1px solid rgba(245,166,35,0.15);"># {{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- 버튼 -->
+        <div class="mt-auto pt-1">
+          {% if n.pblanc_url %}
+          <a href="{{ n.pblanc_url }}" target="_blank" rel="noopener"
+             class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-xs font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+             style="background: rgba(245,166,35,0.12); border: 1px solid rgba(245,166,35,0.25); color: #F5A623;">
+            공고 바로가기
+            <iconify-icon icon="solar:arrow-right-up-linear" style="font-size:13px;"></iconify-icon>
+          </a>
+          {% else %}
+          <div class="flex items-center justify-center w-full py-2.5 rounded-xl text-xs font-medium text-zinc-700 border border-white/5">
+            링크 없음
+          </div>
+          {% endif %}
+        </div>
+
       </div>
+      {% else %}
+
+      <!-- 빈 상태 -->
+      <div class="col-span-full flex flex-col items-center justify-center py-32 gap-4 text-center">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center card-bezel">
+          <iconify-icon icon="solar:inbox-out-linear" class="text-zinc-600" style="font-size:32px;"></iconify-icon>
+        </div>
+        <div>
+          <p class="text-sm font-semibold text-zinc-400">아직 수집된 공고가 없어요</p>
+          <p class="text-xs text-zinc-600 mt-1">매일 오전 9시에 자동으로 수집됩니다</p>
+        </div>
+      </div>
+
+      {% endfor %}
     </div>
-    {% else %}
-    <div class="empty">
-      <div style="font-size:48px;">📭</div>
-      <p>아직 저장된 공고가 없어요.<br>main.py를 먼저 실행해 공고를 수집하세요.</p>
-    </div>
-    {% endfor %}
   </div>
-</main>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 px-4 py-8">
+  <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
+    <div class="flex items-center gap-2">
+      <iconify-icon icon="solar:radar-2-bold-duotone" style="color:#F5A623; font-size:16px;"></iconify-icon>
+      <span class="text-xs font-bold text-zinc-500">땅콩봇</span>
+    </div>
+    <p class="text-xs text-zinc-700">bizinfo.go.kr 기준 · 매일 09:00 KST 자동 수집</p>
+  </div>
+</footer>
 
 <script>
+  // 칩 필터
   let activeKw = '';
-
-  document.querySelectorAll('#chips .chip').forEach(btn => {
+  document.querySelectorAll('.chip').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('#chips .chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll('.chip').forEach(b => b.classList.remove('chip-active'));
+      btn.classList.add('chip-active');
       activeKw = btn.dataset.kw;
       applyFilter();
     });
@@ -379,16 +211,25 @@ HTML = """<!DOCTYPE html>
   function applyFilter() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     document.querySelectorAll('#grid .card').forEach(card => {
-      const title = card.dataset.title.toLowerCase();
-      const org   = card.dataset.org.toLowerCase();
-      const tags  = card.dataset.tags.toLowerCase();
-      const all   = title + ' ' + org + ' ' + tags;
-
+      const all = (card.dataset.title + ' ' + card.dataset.org + ' ' + card.dataset.tags).toLowerCase();
       const matchSearch = !q || all.includes(q);
-      const matchChip   = !activeKw || all.includes(activeKw);
+      const matchChip = !activeKw || all.includes(activeKw);
       card.style.display = (matchSearch && matchChip) ? '' : 'none';
     });
   }
+
+  // 스크롤 리빌
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = parseInt(e.target.style.getPropertyValue('--index')) || 0;
+        setTimeout(() => e.target.classList.add('visible'), idx * 60);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 </script>
 </body>
 </html>"""
@@ -404,7 +245,6 @@ def _format_date(raw):
 
 
 def _dday(raw):
-    """마감일 기준 D-day 계산. raw = '20240101 ~ 20240331'"""
     if not raw:
         return "unknown", "기간 미상"
     dates = re.findall(r"\d{8}", raw)
