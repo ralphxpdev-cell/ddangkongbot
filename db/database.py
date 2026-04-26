@@ -1,25 +1,30 @@
-import sys
 import os
+import sqlite3
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-from config import SUPABASE_URL, SUPABASE_KEY
-from supabase import create_client
-
-_client = None
+DB_PATH = os.path.join(os.path.dirname(__file__), "notices.db")
 
 
-def _get_client():
-    global _client
-    if _client is None:
-        _client = create_client(SUPABASE_URL, SUPABASE_KEY)
-    return _client
+def _get_conn():
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS notices (
+            pblanc_id TEXT PRIMARY KEY,
+            pblanc_nm TEXT,
+            jrsd_instt_nm TEXT,
+            reqst_begin_end_de TEXT,
+            pblanc_url TEXT,
+            hashtags TEXT
+        )
+    """)
+    conn.commit()
+    return conn
 
 
 def is_first_run():
     """DB에 데이터가 하나도 없으면 첫 실행으로 판단."""
-    res = _get_client().table("notices").select("pblanc_id", count="exact").limit(1).execute()
-    return res.count == 0
+    with _get_conn() as conn:
+        row = conn.execute("SELECT COUNT(*) FROM notices").fetchone()
+        return row[0] == 0
 
 
 def filter_new(items):
@@ -27,13 +32,17 @@ def filter_new(items):
     if not items:
         return []
     ids = [item.get("pblancId", "") for item in items if item.get("pblancId")]
-    res = _get_client().table("notices").select("pblanc_id").in_("pblanc_id", ids).execute()
-    existing = {row["pblanc_id"] for row in res.data}
+    with _get_conn() as conn:
+        placeholders = ",".join("?" * len(ids))
+        rows = conn.execute(
+            f"SELECT pblanc_id FROM notices WHERE pblanc_id IN ({placeholders})", ids
+        ).fetchall()
+    existing = {row[0] for row in rows}
     return [item for item in items if item.get("pblancId", "") not in existing]
 
 
 def save(items):
-    """공고 목록을 Supabase에 저장한다."""
+    """공고 목록을 SQLite에 저장한다."""
     if not items:
         return
     rows = []
@@ -41,19 +50,17 @@ def save(items):
         pid = item.get("pblancId", "")
         if not pid:
             continue
-        rows.append({
-            "pblanc_id": pid,
-            "pblanc_nm": item.get("pblancNm", ""),
-            "jrsd_instt_nm": item.get("jrsdInsttNm", ""),
-            "reqst_begin_end_de": item.get("reqstBeginEndDe", ""),
-            "pblanc_url": item.get("pblancUrl", ""),
-            "hashtags": item.get("hashtags", ""),
-        })
+        rows.append((
+            pid,
+            item.get("pblancNm", ""),
+            item.get("jrsdInsttNm", ""),
+            item.get("reqstBeginEndDe", ""),
+            item.get("pblancUrl", ""),
+            item.get("hashtags", ""),
+        ))
     if rows:
-        _get_client().table("notices").upsert(rows).execute()
-
-
-def get_all_notices(limit=200):
-    """저장된 공고 전체를 최신순으로 반환한다."""
-    res = _get_client().table("notices").select("*").order("created_at", desc=True).limit(limit).execute()
-    return res.data
+        with _get_conn() as conn:
+            conn.executemany(
+                "INSERT OR REPLACE INTO notices VALUES (?,?,?,?,?,?)", rows
+            )
+            conn.commit()
